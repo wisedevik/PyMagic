@@ -12,31 +12,21 @@ class Messaging:
     def sendMessage(self, message: PiranhaMessage):
         message.encode()
 
-        encodingBytes = message.getByteStream().getByteArray()[:message.getEncodingLength()]
-        encEncodingBytes = self.encrypter.encrypt(encodingBytes)
+        encodingBytes: bytearray = message.getByteStream().getByteArray()[:message.getEncodingLength()] # take byte array "with data"
+        encEncodingBytes: bytearray = self.encrypter.encrypt(encodingBytes)
 
-        fullPayload = bytearray(len(encEncodingBytes) + 7)
+        fullPayload: bytearray = bytearray(len(encEncodingBytes) + 7)
         Messaging.writeHeader(fullPayload, message, len(encEncodingBytes))
-        fullPayload[7:] = encEncodingBytes
+        fullPayload[7:] = encEncodingBytes # Copy encEncodingBytes to fullPayload from index 7
 
         self.client.send(fullPayload)
         print("[Messaging] Sent " + str(message.getMessageType()))
 
-    def recv(self, n) -> bytearray:
-        data = bytearray()
-        while len(data) < n:
-            packet = self.client.recv(n - len(data))
-            if not packet:
-                print("Data is NULL")
-                return b''
-            data.extend(packet)
-        return data
-
     @staticmethod
     def readHeader(buffer: bytearray):
-        messageType = buffer[0] << 8 | buffer[1]
-        encodingLength = buffer[2] << 16 | buffer[3] << 8 | buffer[4]
-        messageVersion = buffer[5] << 8 | buffer[6]
+        messageType: int = buffer[0] << 8 | buffer[1]
+        encodingLength: int = buffer[2] << 16 | buffer[3] << 8 | buffer[4]
+        messageVersion: int = buffer[5] << 8 | buffer[6]
         return messageType, encodingLength, messageVersion
 
     @staticmethod

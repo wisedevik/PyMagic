@@ -24,8 +24,8 @@ class Connection(threading.Thread):
         self.messaging = Messaging(self.client)
         self.manager = MessageManager(self.messaging)
 
-    def recv(self, n) -> bytearray:
-        data = bytearray()
+    def recv(self, n: int) -> bytearray: # receive packet (payload)
+        data: bytearray = bytearray()
         while len(data) < n:
             packet = self.client.recv(n - len(data))
             if not packet:
@@ -41,9 +41,9 @@ class Connection(threading.Thread):
                 
                 if (len(header) >= 7):
                     messageType, encodingLength, messageVersion = Messaging.readHeader(header)
-                    payload = self.recv(encodingLength)
+                    payload: bytearray = self.recv(encodingLength)
 
-                    decPayload = self.crypto.decrypt(payload)
+                    decPayload: bytearray = self.crypto.decrypt(payload)
                     # print(f"[Connection] Received: Type: {messageType} Length: {encodingLength} Version: {messageVersion}")
                     # printByteArray(decPayload)
 

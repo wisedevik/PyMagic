@@ -241,7 +241,7 @@ class ByteStream(ChecksumEncoder):
 
         if self.offset + capacity > bufferLength:
             tmpBuffer = bytearray(bufferLength + capacity + 100)
-            tmpBuffer[:bufferLength] = self.buffer
+            tmpBuffer[:bufferLength] = self.buffer # copy from buffer to tmpBuffer by bufferLength
             self.buffer = tmpBuffer
 
     def destruct(self):
